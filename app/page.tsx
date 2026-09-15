@@ -51,14 +51,17 @@ import {
   SelectItem,
 } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import {
-  chapters,
-  roles,
-  pathway,
-  assessment,
-  type Role,
-  type Chapter,
-} from './content';
+import type { Role, Chapter } from './content';
+type Curriculum = {
+  chapters: Chapter[];
+  roles: Role[];
+  assessment: {
+    question: string;
+    options: string[];
+    answer: number;
+    explanation: string;
+  }[];
+};
 
 type View =
   | 'My journey'
@@ -211,15 +214,61 @@ function Navigation({
   );
 }
 export default function Home() {
+  const [curriculum, setCurriculum] = useState<Curriculum | null>(null);
+  const [error, setError] = useState(false);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch('/api/learning', { cache: 'no-store', signal: controller.signal })
+      .then(async (response) => {
+        if (response.status === 401) {
+          window.location.replace('/');
+          return;
+        }
+        if (!response.ok) throw new Error('Unable to load learning');
+        setCurriculum(await response.json());
+      })
+      .catch((error) => {
+        if (error.name !== 'AbortError') setError(true);
+      });
+    const expire = window.setInterval(() => {
+      fetch('/api/learning', { cache: 'no-store', signal: controller.signal })
+        .then((r) => {
+          if (r.status === 401) window.location.replace('/');
+        })
+        .catch(() => {});
+    }, 60000);
+    return () => {
+      controller.abort();
+      window.clearInterval(expire);
+    };
+  }, []);
+  if (!curriculum)
+    return (
+      <main id="main-content" className="secure-loading">
+        <Brand />
+        <h1>
+          {error ? 'Unable to load the playbook.' : 'Opening your playbook…'}
+        </h1>
+        {error && (
+          <button className="primary" onClick={() => window.location.reload()}>
+            Try again
+          </button>
+        )}
+      </main>
+    );
   return (
     <SidebarProvider
       style={{ '--sidebar-width': '252px' } as React.CSSProperties}
     >
-      <Workspace />
+      <Workspace curriculum={curriculum} />
     </SidebarProvider>
   );
 }
-function Workspace() {
+function Workspace({ curriculum }: { curriculum: Curriculum }) {
+  const { chapters, roles, assessment } = curriculum;
+  function pathway(role: Role) {
+    return chapters.filter((c) => !c.roles.length || c.roles.includes(role));
+  }
   const [view, setView] = useState<View>('My journey');
   const [record, setRecord] = useState<RecordState>(initial);
   const [loaded, setLoaded] = useState(false);
@@ -475,6 +524,12 @@ function Workspace() {
               {view === 'Chapter' ? 'Learning library' : view}
             </span>
           </div>
+          <form action="/access/lock" method="post" className="lock-form">
+            <button type="submit" className="text-button">
+              <LockKeyhole size={15} />
+              Lock site
+            </button>
+          </form>
           <div className="top-right">
             <span className="review-dot" />
             Content review edition

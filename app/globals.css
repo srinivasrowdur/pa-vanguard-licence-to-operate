@@ -1814,3 +1814,37 @@ fieldset {
     scroll-behavior: auto !important;
   }
 }
+.secure-loading {
+  max-width: 460px;
+  margin: 20vh auto;
+  padding: 35px;
+  text-align: center;
+  background: white;
+  border: 1px solid #dce5e7;
+  border-radius: 10px;
+}
+.secure-loading h1 {
+  font-size: 24px;
+  margin: 30px 0;
+}
+.lock-form {
+  margin-left: auto;
+}
+.lock-form button {
+  font-size: 13px;
+  white-space: nowrap;
+}
+.topbar {
+  gap: 15px;
+}
+@media (max-width: 767px) {
+  .topbar .muted {
+    display: none;
+  }
+  .lock-form button {
+    font-size: 12px;
+  }
+  .topbar > div {
+    gap: 6px;
+  }
+}

@@ -24,3 +24,8 @@ Confirm audience, contract and service boundaries, policy links and versions, in
 
 ## Validation
 Production build and TypeScript validation run before delivery. Content checks confirm all 10 modules, quiz answer validity and the five role pathways (8, 9, 9, 9, 10 required modules). Broad browser QA was not requested. Both WebMCP tools were registered and exercised in a supported browser context: status read, module opening with state read-back, invalid module rejection and invalid read-argument rejection.
+
+## Shared-password access
+The public URL is protected by a server-side gate. Learning content is served only by an authenticated endpoint and is excluded from public client bundles. Password verification uses a server-only hash; sessions use an HMAC signature, Secure/HttpOnly/SameSite cookies and an eight-hour expiry. Changing the password hash invalidates existing sessions. The Lock site action clears the session. Protected responses are not cached and include no-index directives. This shared-password model grants access to anyone who possesses the link and password; it does not identify individual invitees.
+
+Authentication validation covers anonymous HTML, direct API/RSC/assets, valid and invalid passwords, cross-origin submissions, cookie tampering, expiry, duplicated cookies, password rotation, logout, missing configuration and request-size limits.

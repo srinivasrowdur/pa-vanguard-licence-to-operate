@@ -3,6 +3,7 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'PA × Vanguard | Licence to Operate',
   icons: { icon: '/favicon.svg' },
+  robots: { index: false, follow: false },
   description:
     'Your learning pathway and practical delivery playbook for PA teams working with Vanguard.',
 };
