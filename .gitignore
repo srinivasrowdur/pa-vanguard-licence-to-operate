@@ -39,3 +39,6 @@ next-env.d.ts
 
 *.tsbuildinfo
 .dev.vars*
+
+# Separate FCA project
+/pa-fca-licence-to-operate/
